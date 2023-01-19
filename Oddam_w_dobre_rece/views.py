@@ -2,20 +2,25 @@ from django.contrib.auth import authenticate, login
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views import View
-from .models import Institution, Donation, Category
+from .models import Institution, Donation
 from django.contrib.auth.models import User
 
 # Create your views here.
+
 
 class LandingPage(View):
     def get(self, request):
         bags = Donation.objects.all().count()
         supported = Institution.objects.all().count()
-        organizations = Institution.objects.all()
+        fundations = Institution.objects.filter(type=1)
+        ngos = Institution.objects.filter(type=2)
+        local_collects = Institution.objects.filter(type=3)
         ctx = {
             "bags": bags,
             "supported": supported,
-            "organizations": organizations
+            "fundations": fundations,
+            "ngos": ngos,
+            "local_collects": local_collects
         }
         return render(request, "index.html", ctx)
 
@@ -40,7 +45,7 @@ class Login(View):
         elif check_user is None:
             return redirect('register')
         else:
-            response = HttpResponse('Błąd logowania! Nieprawidłowe hasło bądź e-mail!')
+            response = HttpResponse(f'Błąd logowania! Nieprawidłowe hasło bądź e-mail!  {username}  {password}  {user}')
             return response
 
 
