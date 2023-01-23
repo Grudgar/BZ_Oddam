@@ -95,7 +95,7 @@ class Logout(View):
         return redirect('landing-page')
 
 
-class UserPage(View):
+class UserProfile(View):
     def get(self, request):
         if request.user.is_authenticated:
             user = User.objects.get(username=request.user)
@@ -107,6 +107,31 @@ class UserPage(View):
                 "user": user,
                 "donations": donations,
             }
-            return render(request, 'user_page.html', ctx)
+            return render(request, 'user_profile.html', ctx)
         else:
             return render(request, 'login')
+
+    def post(self, request):
+        pickup = request.POST.get('pickup')
+        d = Donation.objects.get(id=pickup)
+        if d.is_archived:
+            d.is_archived = False
+        else:
+            d.is_archived = True
+        d.save()
+        user = User.objects.get(username=request.user)
+        try:
+            donations = Donation.objects.filter(user_id=user)
+        except Exception:
+            donations = None
+        ctx = {
+            "user": user,
+            "donations": donations,
+        }
+        return render(request, 'user_profile.html', ctx)
+
+
+class UserSettings(View):
+    def get(self, request):
+        ctx = 0
+        return render(request, 'user_settings.html', ctx)
