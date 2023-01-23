@@ -93,3 +93,20 @@ class Logout(View):
     def get(self, request):
         logout(request)
         return redirect('landing-page')
+
+
+class UserPage(View):
+    def get(self, request):
+        if request.user.is_authenticated:
+            user = User.objects.get(username=request.user)
+            try:
+                donations = Donation.objects.filter(user_id=user)
+            except Exception:
+                donations = None
+            ctx = {
+                "user": user,
+                "donations": donations,
+            }
+            return render(request, 'user_page.html', ctx)
+        else:
+            return render(request, 'login')

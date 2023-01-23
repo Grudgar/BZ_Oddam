@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="slogan--item">
+<ul>
+    <h1>
+    <li><p>Imię: {{ user.first_name }}</p></li>
+    <li><p>Nazwisko: {{ user.last_name }}</p></li>
+    <li><p>E-mail: {{ user.email }}</p></li>
+    </h1>
+</ul>
+
+    <h1>Twoje Dary:</h1>
+
+<h1>
+    <table>
+        <tr>
+            <th>Fundacja:</th>
+            <th>Ilość worków:</th>
+            <th>Data przekazania:</th>
+            <th>Czy odebrano:</th>
+        </tr>
+
+{% for donation in donations %}
+    <tr>
+            <td>{{ donation.institution }}</td>
+            <td>{{ donation.quantity }}</td>
+            <td>{{ donation.pick_up_date }}</td>
+            <td>{{ donation.is_archived }}</td>
+    </tr>
+    {% endfor %}</table></h1>
+
+</section>
+{% endblock %}
