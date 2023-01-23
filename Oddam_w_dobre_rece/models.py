@@ -21,6 +21,9 @@ class Institution(models.Model):
     type = models.CharField(max_length=64, choices=TYPE, default=1)
     categories = models.ForeignKey(Category, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return self.name
+
 
 class Donation(models.Model):
     quantity = models.IntegerField()

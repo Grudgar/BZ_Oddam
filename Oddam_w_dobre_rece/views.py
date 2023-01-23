@@ -1,8 +1,8 @@
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views import View
-from .models import Institution, Donation
+from .models import Institution, Donation, Category
 from django.contrib.auth.models import User
 
 # Create your views here.
@@ -15,19 +15,35 @@ class LandingPage(View):
         fundations = Institution.objects.filter(type=1)
         ngos = Institution.objects.filter(type=2)
         local_collects = Institution.objects.filter(type=3)
+        try:
+            user = User.objects.get(username=request.user)
+        except Exception:
+            user = None
         ctx = {
             "bags": bags,
             "supported": supported,
             "fundations": fundations,
             "ngos": ngos,
-            "local_collects": local_collects
+            "local_collects": local_collects,
+            "user": user,
         }
         return render(request, "index.html", ctx)
 
 
 class AddDonation(View):
     def get(self, request):
-        return render(request, "form.html")
+        if request.user.is_authenticated:
+            user = User.objects.get(username=request.user)
+            category = Category.objects.all()
+            institutions = Institution.objects.all()
+            ctx = {
+                "user": user,
+                "category": category,
+                "institutions": institutions
+            }
+            return render(request, "form.html", ctx)
+        else:
+            return render(request, "login.html")
 
 
 class Login(View):
@@ -45,7 +61,7 @@ class Login(View):
         elif check_user is None:
             return redirect('register')
         else:
-            response = HttpResponse(f'Błąd logowania! Nieprawidłowe hasło bądź e-mail!  {username}  {password}  {user}')
+            response = HttpResponse(f'Błąd logowania! Nieprawidłowe hasło bądź e-mail!')
             return response
 
 
@@ -65,9 +81,15 @@ class Register(View):
             u.first_name = name
             u.last_name = surname
             u.email = username
-            u.password = password
+            u.set_password(password)
             u.save()
             return render(request, "login.html")
         else:
             msg = "Podano dwa różne hasła, sprawź co wpisałeś/-aś!"
             return render(request, "register.html", context={'msg': msg})
+
+
+class Logout(View):
+    def get(self, request):
+        logout(request)
+        return redirect('landing-page')
