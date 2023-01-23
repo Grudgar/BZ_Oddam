@@ -18,7 +18,7 @@
             <th>Fundacja:</th>
             <th>Ilość worków:</th>
             <th>Data przekazania:</th>
-            <th>Czy odebrano:</th>
+            <th>Stan daru:</th>
         </tr>
 
 {% for donation in donations %}
@@ -26,7 +26,11 @@
             <td>{{ donation.institution }}</td>
             <td>{{ donation.quantity }}</td>
             <td>{{ donation.pick_up_date }}</td>
-            <td>{{ donation.is_archived }}</td>
+            <td>{% if donation.is_archived == False %}
+                <button class="btn btn--without-border" type="submit" value="{{ donation.id }}">Oznacz jako odebrany</button>
+            {% else %}
+                <h2>Odebrany prze fundację</h2>
+            {% endif %}</td>
     </tr>
     {% endfor %}</table></h1>
 
